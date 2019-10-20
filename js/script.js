@@ -1,7 +1,7 @@
 //Функция для получения данных из json
 async function getJson() {
-const response = await fetch('https://raw.githubusercontent.com/wrike/frontend-test/master/data.json');
-return await response.json();
+    const response = await fetch('https://raw.githubusercontent.com/wrike/frontend-test/master/data.json');
+    return await response.json();
 }
 
 //Создание массива дерева
@@ -24,20 +24,20 @@ function CreateTree(data) {
         }
     }
 //Достаем корневые элементы
-    this.treeObject = [];
+    let finalTree = [];
     for(let id of tree.keys()){
         let folder = tree.get(id);
         let parentId = folder.parentId;
         if(parentId === null){
-            this.treeObject.push(folder);
+            finalTree.push(folder);
         }
     }
-
+    return finalTree;
 }
 //Функция отрисовывающая массив на странице
 function printTree(tree) {
     document.getElementById('tree').innerHTML = '';
-    for (let elem of tree.treeObject) {
+    for (let elem of tree) {
         if (!elem.hidden || !hiddenChild(elem)){
             console.log(hiddenChild(elem));
             document.querySelector('#tree').appendChild(createElement(elem));
@@ -51,18 +51,18 @@ function printTree(tree) {
     function printChild(element){
         this.elem = element.children;
         for (let id of this.elem) {
-                if (id.children.length !== 0) {
-                    if(!id.hidden || !hiddenChild(id)) {
-                        document.querySelector(`.node[data-id='${id.parentId}']`).appendChild(createElement(id));
-                        printChild(id);
-                    }
+            if (id.children.length !== 0) {
+                if(!id.hidden || !hiddenChild(id)) {
+                    document.querySelector(`.node[data-id='${id.parentId}']`).appendChild(createElement(id));
+                    printChild(id);
+                }
 
+            }
+            else {
+                if(!id.hidden){
+                    document.querySelector(`.node[data-id='${id.parentId}']`).appendChild(createElement(id));
                 }
-                else {
-                     if(!id.hidden){
-                        document.querySelector(`.node[data-id='${id.parentId}']`).appendChild(createElement(id));
-                     }
-                }
+            }
         }
     }
 
@@ -75,7 +75,7 @@ function printTree(tree) {
                     return hiddenChild(id);
                 }
                 else {
-                return true;
+                    return true;
                 }
             }
             else {
@@ -106,7 +106,7 @@ function printTree(tree) {
 }
 //Функция сортировки
 function sort(tree, reverse = false) {
-    for (let item of tree.treeObject) {
+    for (let item of tree) {
         sortChild(item);
     }
     function sortChild(item) {
@@ -134,7 +134,7 @@ function sort(tree, reverse = false) {
 //Функция поиска
 function  search(tree) {
     let input = document.querySelector("#search").value.toLowerCase();
-    for (let item of tree.treeObject) {
+    for (let item of tree) {
         let name = item.title.toLowerCase();
         item.hidden = !name.includes(input);
         if (item.children.length !== 0) {
