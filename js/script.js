@@ -79,11 +79,42 @@ function printTree(tree) {
         return element;
     }
 }
+//Функция сортировки
+function sort(tree, reverse = false) {
+    for (let item of tree.treeObject) {
+        sortChild(item);
+    }
+    function sortChild(item) {
+        item.children.sort(function (a, b) {
+            if (a.title < b.title) {
+                if (reverse) {
+                    return 1
+                }
+                return -1;
+            }
+            if (a.title > b.title) {
+                if (reverse) {
+                    return -1
+                }
+                return 1;
+            }
+            return 0;
+        });
+        for (let children of item.children) {
+            sortChild(children);
+        }
+    }
+    printTree(tree);
+}
+
 
 //Функция запускающая все остальные функции
 async function start() {
     let data = await getJson();
     let tree = new CreateTree(data);
+    document.querySelector("#btnAZ").onclick = function(){sort(tree)};
+    document.querySelector("#btnZA").onclick = function(){sort(tree, true)};
+    document.querySelector("#search").keydown = console.log(tree);
     printTree(tree);
 }
 let go = start();
