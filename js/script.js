@@ -10,12 +10,12 @@ function CreateTree(data) {
     for (let item of data) {
         tree.set(item.id, {
             id: item.id, title: item.title,
-            parentId: item.parentId, children: [], hidden: false
+            parentId: item.parentId, children: []
         });
     }
-
+//Отдаем детей их родителям
     for(let i = tree.size; i>=-1; i--){
-        for(id of tree.keys()){
+        for(let id of tree.keys()){
             let folder = tree.get(id);
             let parentId = folder.parentId;
             if(folder.parentId === i){
@@ -25,7 +25,7 @@ function CreateTree(data) {
     }
 
     this.treeObject = [];
-    for(id of tree.keys()){
+    for(let id of tree.keys()){
         let folder = tree.get(id);
         let parentId = folder.parentId;
         if(parentId === null){
@@ -38,45 +38,52 @@ function CreateTree(data) {
 function printTree(tree) {
     document.getElementById('tree').innerHTML = '';
     for (let elem of tree.treeObject) {
-        document.querySelector(`#tree`).appendChild(createElement(elem));
+        document.querySelector('#tree').appendChild(createElement(elem));
         if (elem.children.length !== 0){
             printChild(elem);
         }
     }
-    for (const node of document.getElementsByClassName("node-label")) {
-        node.addEventListener("click", toggleNode);
-        if (node.closest(".node").children.length - 1 === 0) node.classList.add("node-label_endpoint");
+
+    //Функция рисующая дочерние элементы дерева
+    function printChild(element){
+        this.elem = element.children;
+        for (let id of this.elem) {
+            if (id.children.length !== 0) {
+                document.querySelector(`.node[data-id='${id.parentId}']`).appendChild(createElement(id));
+                printChild(id);
+
+            }
+            else {
+                document.querySelector(`.node[data-id='${id.parentId}']`).appendChild(createElement(id));
+            }
+        }
     }
-//Функция рисующая дочерние элементы дерева
-function printChild(element){
-    this.elem = element.children;
-    for (let id of this.elem) {
-        if (id.children.length !== 0) {
-            document.querySelector(`#tree`).appendChild(createElement(id));
-            printChild(id);
+
+    //Функция преобразует элемент массива в элемент отображения
+    function createElement(elem){
+        let element = document.createElement("div");
+        element.className = "node";
+        element.dataset.id = elem.id;
+        let name = document.createElement("span");
+        name.innerText = elem.title;
+        element.appendChild(name);
+        if(elem.children.length !== 0){
+            name.className += "parent";
+            name.onclick = function hideChild() {
+                name.classList.toggle("parent_hidden");
+                for(let child of name.closest(".node").querySelectorAll(".node")){
+                    child.classList.toggle("hidden");
+                }
+            }
         }
-        else {
-            document.querySelector(`#tree`).appendChild(createElement(id));
-        }
+        return element;
     }
 }
 
-//Функция преобразует элемент массива в элемент отображения
-function createElement(elem){
-    let element = document.createElement("div");
-    let label = document.createElement("span");
-    label.innerText = elem.title;
-    element.appendChild(label);
-    return element;
-    }
-
-
-}
-
-
+//Функция запускающая все остальные функции
 async function start() {
     let data = await getJson();
     let tree = new CreateTree(data);
     printTree(tree);
 }
-start();
+let go = start();

@@ -38,3 +38,29 @@ button:focus {
     transform: translateY(2px);
     box-shadow: none;
 }
+
+.node {
+    margin: 10px;
+}
+
+.node .node {
+    margin-left: 30px;
+}
+
+.parent {
+    cursor: pointer;
+}
+
+.parent:before {
+    content: url("../icons/expanded_icon.svg");
+    margin-right: 3px;
+}
+
+.parent_hidden:before {
+    content: url("../icons/collapsed_icon.svg");
+    margin-right: 3px;
+}
+
+.hidden {
+    display: none;
+}
